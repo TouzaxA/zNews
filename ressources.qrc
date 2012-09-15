@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/runWindow">
+        <file>Ressources/zozor.png</file>
+        <file>Ressources/exit.png</file>
+        <file>Ressources/new.png</file>
+        <file>Ressources/open.png</file>
+        <file>Ressources/save.png</file>
+        <file>Ressources/parse.png</file>
+        <file>Ressources/template.tpl</file>
+    </qresource>
+</RCC>
