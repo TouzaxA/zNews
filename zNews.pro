@@ -16,13 +16,15 @@ SOURCES += main.cpp\
     runwindow.cpp \
     fonction.cpp \
     news.cpp \
-    zcode.cpp
+    zcode.cpp \
+    about.cpp
 
 HEADERS  += mainwindow.h \
     runwindow.h \
     fonction.h \
     news.h \
-    zcode.h
+    zcode.h \
+    about.h
 
 RESOURCES += \
     ressources.qrc
