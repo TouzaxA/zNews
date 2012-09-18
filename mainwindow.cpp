@@ -18,6 +18,7 @@
 #include <QtXml>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+    currentFile = 0;
     setMinimumSize(800, 600);
 
     middleArea = new QWidget;
@@ -122,41 +123,43 @@ void MainWindow::openNews(QString path) {
     // On va ouvrir le fichier XML et en extraire ce dont on a besoin
     QDomDocument dom("news_xml");
     QFile newsFile(path);
-    if(!newsFile.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, "Impossible d'ouvrir le fichier", "Erreur lors de l'ouverture de " + path);
-        qApp->exit();
-    }
-    if(!dom.setContent(&newsFile, false)) {
-        newsFile.close();
-        QMessageBox::critical(this, "Impossible de parser le XML", "Impossible d'analyser le fichier " + path);
-        qApp->exit();
-    }
-    QDomElement racine = dom.documentElement();
-    racine = racine.firstChildElement();
-    while(!racine.isNull()) {
-        if(racine.tagName() == "header") {
-            QDomElement elm = racine.firstChildElement();
-            while(!elm.isNull()) {
-                if(elm.tagName() == "title") {
-                    title = elm.text();
+    if(newsFile.exists()) {
+        if(!newsFile.open(QIODevice::ReadOnly)) {
+            QMessageBox::critical(this, "Impossible d'ouvrir le fichier", "Erreur lors de l'ouverture de " + path);
+            qApp->exit();
+        }
+        if(!dom.setContent(&newsFile, false)) {
+            newsFile.close();
+            QMessageBox::critical(this, "Impossible de parser le XML", "Impossible d'analyser le fichier " + path);
+            qApp->exit();
+        }
+        QDomElement racine = dom.documentElement();
+        racine = racine.firstChildElement();
+        while(!racine.isNull()) {
+            if(racine.tagName() == "header") {
+                QDomElement elm = racine.firstChildElement();
+                while(!elm.isNull()) {
+                    if(elm.tagName() == "title") {
+                        title = elm.text();
+                    }
+                    elm = elm.nextSiblingElement();
                 }
-                elm = elm.nextSiblingElement();
             }
+            racine = racine.nextSiblingElement();
+            if(racine.tagName() == "content") {
+                content = trim(racine.text());
+            }
+            racine = racine.nextSiblingElement();
         }
-        racine = racine.nextSiblingElement();
-        if(racine.tagName() == "content") {
-            content = trim(racine.text());
-        }
-        racine = racine.nextSiblingElement();
+        news->setContent(content);
+        news->setTitle(title);
+        nTitle->setText(title);
+        editor->setText(content);
+        sParse();
+        setWindowTitle("zNews - " + newsFile.fileName());
+        newsFile.close();
+        currentFile = &newsFile;
     }
-    news->setContent(content);
-    news->setTitle(title);
-    nTitle->setText(title);
-    editor->setText(content);
-    sParse();
-    setWindowTitle("zNews - " + newsFile.fileName());
-    newsFile.close();
-    currentFile = &newsFile;
 }
 
 void MainWindow::newNews() {
