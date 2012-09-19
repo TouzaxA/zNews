@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "fonction.h"
 #include "zcode.h"
+#include "about.h"
 #include <QMainWindow>
 #include <QVBoxLayout>
 #include <QTextEdit>
@@ -17,6 +18,7 @@
 #include <QtXml>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+    currentFile = 0;
     setMinimumSize(800, 600);
 
     middleArea = new QWidget;
@@ -24,16 +26,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     titleLayout = new QHBoxLayout;
     lbl = new QLabel("Titre :");
     nTitle = new QLineEdit;
-    nTitle->setText("Titre");
+    nTitle->setText("Titre de votre news");
     titleLayout->addWidget(lbl);
     titleLayout->addWidget(nTitle);
 
     mainLayout = new QVBoxLayout;
     editor = new QTextEdit;
-    editor->setText("Inserez ici votre contenu :p ");
+    editor->setText("Inserez ici le contenu de votre news");
     view = new QWebView;
-
-
 
     mainLayout->addLayout(titleLayout);
     mainLayout->addWidget(editor);
@@ -65,22 +65,29 @@ void MainWindow::buildMenu() {
     newN = new QAction("&Nouveau", this);
     newN->setShortcut(QKeySequence(QKeySequence::New));
     newN->setIcon(QIcon(":/runWindow/Ressources/new.png"));
+    newN->setStatusTip("Ecrire une nouvelle news");
     open = new QAction("&Ouvrir", this);
     open->setShortcut(QKeySequence(QKeySequence::Open));
     open->setIcon(QIcon(":/runWindow/Ressources/open.png"));
+    open->setStatusTip("Ouvrir une news existante");
     save = new QAction("&Sauvegarder", this);
     save->setShortcut(QKeySequence(QKeySequence::Save));
     save->setIcon(QIcon(":/runWindow/Ressources/save.png"));
+    save->setStatusTip("Sauvegarder votre news");
+    about = new QAction("&A propos", this);
+    about->setShortcut(QKeySequence(QKeySequence::HelpContents));
 
     file->addAction(newN);
     file->addAction(open);
     file->addAction(save);
+    file->addAction(about);
 
     // Le bouton Quitter qui ne doit pas exister sur Mac
     #ifndef Q_WS_MAC
     quit = new QAction("&Quitter", this);
     quit->setShortcut(QKeySequence(QKeySequence::Quit));
     quit->setIcon(QIcon(":/runWindow/Ressources/exit.png"));
+    quit->setStatusTip("Quitter zNews");
     file->addAction(quit);
     connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
     #endif
@@ -88,6 +95,7 @@ void MainWindow::buildMenu() {
     parse = new QAction("&Previsualiser", this);
     parse->setShortcut(QKeySequence("Ctrl+P"));
     parse->setIcon(QIcon(":/runWindow/Ressources/parse.png"));
+    parse->setStatusTip("Previsualiser votre news");
     viewMenu->addAction(parse);
 
     bar = addToolBar("News");
@@ -100,15 +108,12 @@ void MainWindow::buildMenu() {
 }
 
 void MainWindow::buildDock() {
-    dockRessource = new QDockWidget("Ressources", this);
-    addDockWidget(Qt::LeftDockWidgetArea, dockRessource);
-    /*ressources = new QStringListModel(news->ressources());
-    resView = new QListView;
-    resView->setModel(ressources);
-    dockRessource->setWidget(resView);*/
+    //dockRessource = new QDockWidget("Ressources", this);
+    //addDockWidget(Qt::LeftDockWidgetArea, dockRessource);
 
-    dockZCode = new QDockWidget("ZCode", this);
-    addDockWidget(Qt::LeftDockWidgetArea, dockZCode);
+
+    //dockZCode = new QDockWidget("ZCode", this);
+    //addDockWidget(Qt::LeftDockWidgetArea, dockZCode);
 }
 
 void MainWindow::openNews(QString path) {
@@ -118,40 +123,43 @@ void MainWindow::openNews(QString path) {
     // On va ouvrir le fichier XML et en extraire ce dont on a besoin
     QDomDocument dom("news_xml");
     QFile newsFile(path);
-    if(!newsFile.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, "Impossible d'ouvrir le fichier", "Erreur lors de l'ouverture de " + path);
-        qApp->exit();
-    }
-    if(!dom.setContent(&newsFile, false)) {
-        newsFile.close();
-        QMessageBox::critical(this, "Impossible de parser le XML", "Impossible d'analyser le fichier " + path);
-        qApp->exit();
-    }
-    QDomElement racine = dom.documentElement();
-    racine = racine.firstChildElement();
-    while(!racine.isNull()) {
-        if(racine.tagName() == "header") {
-            QDomElement elm = racine.firstChildElement();
-            while(!elm.isNull()) {
-                if(elm.tagName() == "title") {
-                    title = elm.text();
+    if(newsFile.exists()) {
+        if(!newsFile.open(QIODevice::ReadOnly)) {
+            QMessageBox::critical(this, "Impossible d'ouvrir le fichier", "Erreur lors de l'ouverture de " + path);
+            qApp->exit();
+        }
+        if(!dom.setContent(&newsFile, false)) {
+            newsFile.close();
+            QMessageBox::critical(this, "Impossible de parser le XML", "Impossible d'analyser le fichier " + path);
+            qApp->exit();
+        }
+        QDomElement racine = dom.documentElement();
+        racine = racine.firstChildElement();
+        while(!racine.isNull()) {
+            if(racine.tagName() == "header") {
+                QDomElement elm = racine.firstChildElement();
+                while(!elm.isNull()) {
+                    if(elm.tagName() == "title") {
+                        title = elm.text();
+                    }
+                    elm = elm.nextSiblingElement();
                 }
-                elm = elm.nextSiblingElement();
             }
+            racine = racine.nextSiblingElement();
+            if(racine.tagName() == "content") {
+                content = trim(racine.text());
+            }
+            racine = racine.nextSiblingElement();
         }
-        racine = racine.nextSiblingElement();
-        if(racine.tagName() == "content") {
-            content = trim(racine.text());
-        }
-        racine = racine.nextSiblingElement();
+        news->setContent(content);
+        news->setTitle(title);
+        nTitle->setText(title);
+        editor->setText(content);
+        sParse();
+        setWindowTitle("zNews - " + newsFile.fileName());
+        newsFile.close();
+        currentFile = &newsFile;
     }
-    news->setContent(content);
-    news->setTitle(title);
-    nTitle->setText(title);
-    editor->setText(content);
-    sParse();
-    newsFile.close();
-    currentFile = &newsFile;
 }
 
 void MainWindow::newNews() {
@@ -174,6 +182,8 @@ void MainWindow::manageSlots() {
     connect(parse, SIGNAL(triggered()), this, SLOT(sParse()));
     connect(open, SIGNAL(triggered()), this, SLOT(sOpen()));
     connect(save, SIGNAL(triggered()), this, SLOT(sSave()));
+    connect(newN, SIGNAL(triggered()), this, SLOT(sNew()));
+    connect(about, SIGNAL(triggered()), this, SLOT(aboutProgramme()));
 }
 
 void MainWindow::sParse() {
@@ -237,6 +247,7 @@ void MainWindow::sSave() {
         QString path = QFileDialog::getSaveFileName(this, "Enregistrer la news", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation), "News (*.news)");
         currentFile = new QFile(path);
         news->saveIn(currentFile);
+        setWindowTitle("zNews - " + currentFile->fileName());
     }
 }
 
@@ -247,4 +258,26 @@ void MainWindow::closeEvent(QCloseEvent *e) {
         sSave();
     }
     e->accept();
+}
+
+void MainWindow::sNew() {
+    int save = QMessageBox::question(this, "Sauvegarder la news en cours", "Voulez-vous sauvegarder la news en cours ?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
+    if(save == QMessageBox::Yes) {
+        // On sauvegarde
+        sSave();
+    }
+
+    if(currentFile != 0) {
+        delete currentFile;
+        currentFile = 0;
+    }
+
+    editor->clear();
+    nTitle->clear();
+    setWindowTitle("zNews - Nouvelle News");
+}
+
+void MainWindow::aboutProgramme() {
+    About a(this);
+    a.exec();
 }

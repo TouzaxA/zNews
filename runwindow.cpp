@@ -21,7 +21,7 @@ RunWindow::RunWindow(QWidget *parent) : QWidget(parent) {
     secLayout = new QHBoxLayout;
     thiLayout = new QVBoxLayout;
 
-    title = new QLabel("ZNews: Ecrivez vos news");
+    title = new QLabel("ZNews : Ecrivez vos news");
     mainLayout->addWidget(title);
 
     lblImg = new QLabel(this);

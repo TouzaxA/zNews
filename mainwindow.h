@@ -31,6 +31,8 @@ class MainWindow : public QMainWindow
         void sParse();
         void sOpen();
         void sSave();
+        void sNew();
+        void aboutProgramme();
 
     private:
         // Conteneur principal
@@ -49,6 +51,7 @@ class MainWindow : public QMainWindow
         QAction *newN;
         QAction *open;
         QAction *save;
+        QAction *about;
         QAction *quit;
         QAction *parse;
 

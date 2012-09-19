@@ -1,4 +1,5 @@
 #include "zcode.h"
+#include <QRegExp>
 
 ZCode::ZCode(QString &txt) {
     content = txt;
@@ -9,6 +10,16 @@ QString ZCode::encode() {
     QString toEncode = content.toAscii();
 
     // Le ZCode en lui même
+    toEncode.replace(QRegExp("<gras>([^<]*)</gras>"), "<strong>\\1</strong>");
+    toEncode.replace(QRegExp("<italique>([^<]*)</italique>"), "<span class=\"italique\">\\1</span>");
+    toEncode.replace(QRegExp("<souligne>([^<]*)</souligne>"), "<span class=\"souligne\">\\1</span>");
+    toEncode.replace(QRegExp("<barre>([^<]*)</barre>"), "<span class=\"barre\">\\1</span>");
+    toEncode.replace(QRegExp("<flottant valeur=\"gauche\">([^<]*)</flottant>") , "<div class=\"flot_gauche\">\\1</span>");
+    toEncode.replace(QRegExp("<flottant valeur=\"droite\">([^<]*)</flottant>") , "<div class=\"flot_droite\">\\1</span>");
+    toEncode.replace(QRegExp("<titre1>([^<]*)</titre1>"), "<h3>\\1</h3>");
+    toEncode.replace(QRegExp("<titre2>([^<]*)</titre2>"), "<h4>\\1</h4>");
+    toEncode.replace(QRegExp("<liste>([^<]*)</liste>"), "<ul>\\1</ul>");
+    toEncode.replace(QRegExp("<puce>([^<]*)</puce>"), "<li>\\1</li>");
 
     // Les smileys :p
     toEncode.replace(" :) ", " <img src=\"smileys/smile.png\" /> ");
