@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     mainLayout = new QVBoxLayout;
     editor = new QTextEdit;
-    editor->setText("Inserez ici le contenu de votre news");
+    editor->setText("Insérez ici le contenu de votre news");
     view = new QWebView;
 
     mainLayout->addLayout(titleLayout);
@@ -59,13 +59,13 @@ void MainWindow::resizeEvent(QResizeEvent *) {
 
 void MainWindow::buildMenu() {
     file = menuBar()->addMenu("&Fichier");
-    edition = menuBar()->addMenu("&Edition");
+    edition = menuBar()->addMenu("&Édition");
     viewMenu = menuBar()->addMenu("&Affichage");
 
     newN = new QAction("&Nouveau", this);
     newN->setShortcut(QKeySequence(QKeySequence::New));
     newN->setIcon(QIcon(":/runWindow/Ressources/new.png"));
-    newN->setStatusTip("Ecrire une nouvelle news");
+    newN->setStatusTip("Écrire une nouvelle news");
     open = new QAction("&Ouvrir", this);
     open->setShortcut(QKeySequence(QKeySequence::Open));
     open->setIcon(QIcon(":/runWindow/Ressources/open.png"));
@@ -74,7 +74,7 @@ void MainWindow::buildMenu() {
     save->setShortcut(QKeySequence(QKeySequence::Save));
     save->setIcon(QIcon(":/runWindow/Ressources/save.png"));
     save->setStatusTip("Sauvegarder votre news");
-    about = new QAction("&A propos", this);
+    about = new QAction("&À propos", this);
     about->setShortcut(QKeySequence(QKeySequence::HelpContents));
 
     file->addAction(newN);
@@ -92,10 +92,10 @@ void MainWindow::buildMenu() {
     connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
     #endif
 
-    parse = new QAction("&Previsualiser", this);
+    parse = new QAction("&Prévisualiser", this);
     parse->setShortcut(QKeySequence("Ctrl+P"));
     parse->setIcon(QIcon(":/runWindow/Ressources/parse.png"));
-    parse->setStatusTip("Previsualiser votre news");
+    parse->setStatusTip("Prévisualiser votre news");
     viewMenu->addAction(parse);
 
     bar = addToolBar("News");

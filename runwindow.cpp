@@ -21,7 +21,7 @@ RunWindow::RunWindow(QWidget *parent) : QWidget(parent) {
     secLayout = new QHBoxLayout;
     thiLayout = new QVBoxLayout;
 
-    title = new QLabel("ZNews : Ecrivez vos news");
+    title = new QLabel("<center>ZNews : Écrivez vos news</center>");
     mainLayout->addWidget(title);
 
     lblImg = new QLabel(this);
@@ -67,7 +67,7 @@ void RunWindow::openNews() {
 
 void RunWindow::newNews() {
     /*QStringList cat;
-    cat << "Logiciel" << "Programmation" << "Projet des zeros" << "Site du Zero" << "Web" << "Tutoriels" << "Concours" << "Securite"<< "Telephonie mobile" << "Livre du Zero" << "Libre" << "Sciences" << "Récap'" << "Evenements" << "Autres" << "Robotique" << "Interviews" << "Ebook";
+    cat << "Logiciel" << "Programmation" << "Projet des zéros" << "Site du Zéro" << "Web" << "Tutoriels" << "Concours" << "Sécurité"<< "Téléphonie mobile" << "Livre du Zéro" << "Libre" << "Sciences" << "Récap'"  << "Robotique" << "Interviews" << "Ebook" << "Évènements" << "Autres";
     QString newCat = QInputDialog::getItem(this, "Categorie", "Selectionner la categorie de la news", cat);*/
     mw->newNews();
     hide();

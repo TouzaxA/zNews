@@ -8,6 +8,9 @@
 #include "runwindow.h"
 
 int main(int argc, char *argv[]) {
+
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8")); // L'application utilise l'UTF-8 pour l'affichage des caractères
+
     QApplication a(argc, argv);
 
     QString locale = QLocale::system().name().section('_', 0, 0);
